@@ -7,7 +7,7 @@ class Category(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     short_description = models.CharField(max_length=300)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
