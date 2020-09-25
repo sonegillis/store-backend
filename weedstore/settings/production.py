@@ -1,4 +1,4 @@
-from weedstore.settings.base import *
+from .base import *
 import environ
 
 env = environ.Env()
@@ -24,3 +24,7 @@ STATIC_ROOT = '/home/ubuntu/static'
 MEDIA_ROOT = '/home/ubuntu/media'
 
 SECRET_KEY = env('SECRET_KEY')
+
+CORS_ALLOWED_ORIGINS = [
+    "http://medicannsales.com",
+]

@@ -31,23 +31,19 @@ class MeasurementUnit(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=30)
-    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, related_name='products')
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    measurement_unit = models.ManyToManyField(MeasurementUnit)
+    measurement_unit = models.ForeignKey(MeasurementUnit, on_delete=models.DO_NOTHING)
     in_stock = models.BooleanField(default=True)
     price_per_unit = models.FloatField()
     image = models.ImageField(upload_to='product_images')
     rating = models.FloatField(default=5)
     min_order = models.FloatField()
+    discount_price_per_unit = models.FloatField(null=True)
 
     class Meta:
         verbose_name_plural = 'Products'
 
     def __str__(self):
         return self.name
-
-
-# class ProductMeasurementUnit(models.Model):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     measurement_unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE)
