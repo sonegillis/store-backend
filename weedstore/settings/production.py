@@ -24,7 +24,8 @@ STATIC_ROOT = '/home/ubuntu/static'
 MEDIA_ROOT = '/home/ubuntu/media'
 
 SECRET_KEY = env('SECRET_KEY')
+HOST_DOMAIN = env('PRODUCTION_DOMAIN')
 
 CORS_ALLOWED_ORIGINS = [
-    "http://medicannsales.com",
+    HOST_DOMAIN,
 ]

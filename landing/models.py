@@ -47,3 +47,15 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CartItem(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='carts')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='products')
+    quantity = models.IntegerField()
+
+    class Meta:
+        unique_together = ('user', 'product',)
+
+    def __str__(self):
+        return "{} has ordered {} of {}".format(self.user.email, self.quantity, self.product.name)

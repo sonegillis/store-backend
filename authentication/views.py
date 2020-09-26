@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -16,10 +17,11 @@ from .models import TemporaryRegisteredUsers
 def create_account(request):
     email = json.loads(request.body.decode('utf-8'))["email"]
     subject = 'Welcome to Medicannsales'
-    temporary_user = TemporaryRegisteredUsers.objects.create(email=email)
+    temporary_user, created = TemporaryRegisteredUsers.objects.get_or_create(email=email)
     temporary_user.save()
     html_response = render_to_string('authentication/account_create_email.html',
-                                     {'id': temporary_user.id, 'token': temporary_user.id})
+                                     {'id': temporary_user.id, 'token': temporary_user.id,
+                                      'domain': settings.HOST_DOMAIN})
     response = {
         'msg': 'Your account has been created successfully, Please activate it '
                'by clicking on the link sent to your email',

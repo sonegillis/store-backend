@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Category, Product, MeasurementUnit
+from .models import Category, Product, MeasurementUnit, CartItem
 
 
 class MeasurementUnitSerializer(serializers.ModelSerializer):
@@ -10,23 +10,22 @@ class MeasurementUnitSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    measurement_unit = MeasurementUnitSerializer()
-
     class Meta:
         model = Product
         fields = '__all__'
+
+
+class CartSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+
+    class Meta:
+        model = CartItem
+        fields = ['product', 'quantity']
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True)
+
     class Meta:
         model = Category
         fields = '__all__'
-
-
-class MainProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-
-    def to_representation(self, instance):
-        ret = super()
-        print('instance ', instance)
