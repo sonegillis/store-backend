@@ -10,12 +10,16 @@ from rest_framework.decorators import api_view
 from rest_framework.utils import json
 
 from .models import TemporaryRegisteredUsers
+from ..landing.models import UserProfile
 
 
 @csrf_exempt
 @api_view(['POST'])
 def create_account(request):
     email = json.loads(request.body.decode('utf-8'))["email"]
+    if User.objects.filter(email=email).exists():
+        return JsonResponse({'msg': 'User account already exist with this mail', 'erc': 0})
+
     subject = 'Welcome to Medicannsales'
     temporary_user, created = TemporaryRegisteredUsers.objects.get_or_create(email=email)
     temporary_user.save()
@@ -27,7 +31,8 @@ def create_account(request):
                'by clicking on the link sent to your email',
         'erc': 1
     }
-    send_mail(subject, message="", from_email="georgeclinton105@gmail.com", recipient_list=[email], html_message=html_response)
+    send_mail(subject, message="", from_email="georgeclinton105@gmail.com",
+              recipient_list=[email], html_message=html_response)
     return JsonResponse(response)
 
 
@@ -39,6 +44,7 @@ def account_setup(request):
     password = data["password"]
     token = data['token']
     temp_account = TemporaryRegisteredUsers.objects.get(id=token)
+
     response = {
         'msg': '',
         'erc': 0
@@ -52,6 +58,8 @@ def account_setup(request):
         )
         try:
             user.save()
+            user_profile = UserProfile(user=user, points=0)
+            user_profile.save()
             temp_account.delete()
             response['msg'] = 'Your account has been activated'
             response['erc'] = 1

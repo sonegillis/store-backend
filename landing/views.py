@@ -1,8 +1,7 @@
 import json
 
-from django.db.models import Sum, Count, Max
+from django.db.models import Count
 from django.http import JsonResponse
-from django.shortcuts import render
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
@@ -29,7 +28,6 @@ class ProductView(generics.ListAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        print(self.kwargs)
         return Product.objects.all()
 
 
@@ -74,8 +72,8 @@ def add_to_cart(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def delete_from_cart(request):
-    product_id = json.loads(request.body.decode('utf-8'))
-    qs = Category.objects.get(product_id=product_id)
+    data = json.loads(request.body.decode('utf-8'))
+    qs = CartItem.objects.filter(user_id=request.user.id, product_id=data['product'])
     qs.delete()
 
     return JsonResponse({'msg': 'Successfully deleted from cart'})
