@@ -38,7 +38,6 @@ class MainCategoriesView(generics.ListAPIView):
     def get_queryset(self):
         qs = Category.objects.values('id', 'products').annotate(total=Count('products')) \
                  .order_by('-total').values_list('id', flat=True)[:2]
-        print(qs)
         return Category.objects.filter(pk__in=qs)
 
 
