@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework.utils import json
 
 from .models import TemporaryRegisteredUsers
-from ..landing.models import UserProfile
+from landing.models import UserProfile
 
 
 @csrf_exempt
