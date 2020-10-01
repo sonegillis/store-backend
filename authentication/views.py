@@ -9,8 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.utils import json
 
-from .models import TemporaryRegisteredUsers
-from landing.models import UserProfile
+from .models import TemporaryRegisteredUsers, UserProfile
 
 
 @csrf_exempt

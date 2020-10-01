@@ -11,7 +11,8 @@ class Category(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     short_description = models.CharField(max_length=300, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    parentCategory = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    parentCategory = models.ForeignKey('self', on_delete=models.CASCADE,
+                                       null=True, blank=True, related_name='categories')
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -62,20 +63,3 @@ class CartItem(models.Model):
 
     def __str__(self):
         return "{} has ordered {} of {}".format(self.user.email, self.quantity, self.product.name)
-
-
-class UserProfile(models.Model):
-    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
-    referral_code = models.CharField(max_length=100, unique=True)
-    points = models.IntegerField()
-
-    def get_random_string(self):
-        letters = string.ascii_lowercase
-        return ''.join(random.choice(letters) for i in range(6))
-
-    def __str__(self):
-        return "{}".format(self.user.username)
-
-    def save(self, *args, **kwargs):
-        self.referral_code = self.get_random_string()
-        return super(UserProfile, self).save()

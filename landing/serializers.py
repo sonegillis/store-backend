@@ -29,3 +29,11 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+    def to_representation(self, instance):
+        data = super(CategorySerializer, self).to_representation(instance)
+        pk = data.get('id')
+        child_categories = CategorySerializer(data=Category.objects.get(id=pk).categories.all(), many=True)
+        child_categories.is_valid()
+        data['child_categories'] = child_categories.data
+        return data

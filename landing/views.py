@@ -21,6 +21,9 @@ class CategoryView(generics.ListAPIView):
 
     permission_classes = [permissions.AllowAny]
 
+    def get_queryset(self):
+        return Category.objects.filter(parentCategory__isnull=True)
+
 
 class ProductView(generics.ListAPIView):
     model = Product
