@@ -22,7 +22,7 @@ class CategoryView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        return Category.objects.filter(parentCategory__isnull=True)
+        return Category.objects.all()
 
 
 class ProductView(generics.ListAPIView):
@@ -31,6 +31,9 @@ class ProductView(generics.ListAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
+        categories = self.request.query_params.getlist('categories', [])
+        if len(categories):
+            return Product.objects.filter(category__in=categories)
         return Product.objects.all()
 
 
@@ -66,8 +69,25 @@ def add_to_cart(request):
             cart_item.save()
         user_cart = CartItem.objects.filter(user_id=user.id)
         serializer = CartSerializer(user_cart, context={'request': request}, many=True)
-        print(serializer.data)
         return Response({'msg': 'Successfully added to cart', 'cart': serializer.data})
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+def update_cart(request):
+    if request.method == 'POST':
+        user = request.user
+        data = json.loads(request.body.decode('utf-8'))
+        quantity = data['quantity']
+        product = data['product']
+        cart_item = CartItem.objects.get(product_id=product, user_id=user.id)
+        if cart_item:
+            cart_item.quantity = quantity
+            cart_item.save()
+            serializer = CartSerializer(CartItem.objects.filter(user_id=user.id),
+                                        context={'request': request}, many=True)
+            return Response({'msg': 'Successfully updated cart', 'cart': serializer.data})
 
 
 @csrf_exempt

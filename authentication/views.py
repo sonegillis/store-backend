@@ -6,10 +6,13 @@ from django.http import JsonResponse
 # Create your views here.
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import generics
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.utils import json
 
 from .models import TemporaryRegisteredUsers, UserProfile
+from .serializers import UserProfileSerializer
 
 
 @csrf_exempt
@@ -41,8 +44,11 @@ def account_setup(request):
     data = json.loads(request.body.decode('utf-8'))
     username = data["username"]
     password = data["password"]
+    referral = data["referral"]
+
     token = data['token']
     temp_account = TemporaryRegisteredUsers.objects.get(id=token)
+    user_who_referred = UserProfile.objects.get(referral_code__iexact=referral)
 
     response = {
         'msg': '',
@@ -60,9 +66,23 @@ def account_setup(request):
             user_profile = UserProfile(user=user, points=0)
             user_profile.save()
             temp_account.delete()
+
+            if user_who_referred:
+                user_who_referred.points += 10;
+                user_who_referred.save()
+
             response['msg'] = 'Your account has been activated'
             response['erc'] = 1
         except Exception as e:
             print('exception is ', e)
 
     return JsonResponse(response)
+
+
+class UserProfileView(generics.GenericAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = (IsAuthenticated,)
+    http_method_names = ["GET"]
+
+    def get_queryset(self):
+        return UserProfile.objects.get(user_id=self.request.user.id)

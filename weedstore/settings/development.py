@@ -29,5 +29,5 @@ HOST_DOMAIN = "http://localhost:4200"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
-    "http://*"
+    "http://192.168.43.182:4200"
 ]

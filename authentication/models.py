@@ -22,7 +22,9 @@ class TemporaryRegisteredUsers(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
     referral_code = models.CharField(max_length=100, unique=True)
-    points = models.IntegerField()
+    points = models.IntegerField(),
+    shipping_address = models.CharField(max_length=255, null=True)
+    phone_number = models.CharField(max_length=20, null=True)
 
     def get_random_string(self):
         letters = string.ascii_lowercase

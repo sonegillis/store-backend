@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.urls import path
 
-from .views import CategoryView, ProductView, MainCategoriesView, add_to_cart, delete_from_cart, GetCart
+from .views import (
+    CategoryView, ProductView, MainCategoriesView,
+    add_to_cart, delete_from_cart, GetCart, update_cart
+)
 
 urlpatterns = [
     path('categories', CategoryView.as_view()),
@@ -11,4 +14,5 @@ urlpatterns = [
     path('add-to-cart', add_to_cart),
     path('get-cart', GetCart.as_view()),
     path('delete-from-cart', delete_from_cart),
+    path('update-cart', update_cart)
 ]
