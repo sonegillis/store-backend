@@ -48,7 +48,7 @@ def account_setup(request):
 
     token = data['token']
     temp_account = TemporaryRegisteredUsers.objects.get(id=token)
-    user_who_referred = UserProfile.objects.get(referral_code__iexact=referral)
+    user_who_referred = UserProfile.objects.filter(referral_code__iexact=referral)
 
     response = {
         'msg': '',
@@ -67,9 +67,9 @@ def account_setup(request):
             user_profile.save()
             temp_account.delete()
 
-            if user_who_referred:
-                user_who_referred.points += 10;
-                user_who_referred.save()
+            if user_who_referred.exists():
+                user_who_referred[0].points += 10
+                user_who_referred[0].save()
 
             response['msg'] = 'Your account has been activated'
             response['erc'] = 1
