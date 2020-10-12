@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.http import JsonResponse
+from rest_framework.response import Response
 
 # Create your views here.
 from django.template.loader import render_to_string
@@ -80,9 +81,19 @@ def account_setup(request):
 
 
 class UserProfileView(generics.GenericAPIView):
-    serializer_class = UserProfileSerializer
     permission_classes = (IsAuthenticated,)
-    http_method_names = ["GET"]
 
-    def get_queryset(self):
-        return UserProfile.objects.get(user_id=self.request.user.id)
+    def get(self, *args):
+        user_profile = UserProfile.objects.get(user_id=self.request.user.id)
+        user_profile_serializer = UserProfileSerializer(user_profile, context={'request': self.request})
+        print(user_profile_serializer.data)
+        return Response(user_profile_serializer.data)
+
+    def post(self, *args):
+        user_address = self.request.data.get('user_address', '')
+        phone_number = self.request.data.get('phone_number', '')
+        user_profile = UserProfile.objects.get(user_id=self.request.user.id)
+        user_profile.shipping_address = user_address
+        user_profile.phone_number = phone_number
+        user_profile.save()
+        return JsonResponse({'msg': 'Successfully updated your profile'})
