@@ -86,7 +86,6 @@ class UserProfileView(generics.GenericAPIView):
     def get(self, *args):
         user_profile = UserProfile.objects.get(user_id=self.request.user.id)
         user_profile_serializer = UserProfileSerializer(user_profile, context={'request': self.request})
-        print(user_profile_serializer.data)
         return Response(user_profile_serializer.data)
 
     def post(self, *args):
