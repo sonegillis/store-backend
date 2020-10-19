@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Category, Product, MeasurementUnit
+from .models import Category, Product, MeasurementUnit, Cashier
 
 
 @admin.register(Category)
@@ -16,4 +16,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(MeasurementUnit)
 class CategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Cashier)
+class CashierAdmin(admin.ModelAdmin):
     pass

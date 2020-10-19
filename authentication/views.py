@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.utils import json
 
 from .models import TemporaryRegisteredUsers, UserProfile
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, UserSerializer
 
 
 @csrf_exempt
@@ -78,6 +78,16 @@ def account_setup(request):
             print('exception is ', e)
 
     return JsonResponse(response)
+
+
+class UserView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return User.objects.get(id=self.request.user.id)
+
+    def get_serializer(self, *args, **kwargs):
+        return UserSerializer(self.get_queryset())
 
 
 class UserProfileView(generics.GenericAPIView):

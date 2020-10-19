@@ -1,7 +1,8 @@
 import json
+import random
 
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
@@ -10,8 +11,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from .models import Category, Product, CartItem
-from .serializers import CategorySerializer, ProductSerializer, CartSerializer
+from .models import Category, Product, CartItem, Order, Cashier
+from .serializers import CategorySerializer, ProductSerializer, CartSerializer, OrderSerializer, CashierSerializer
 
 
 class CategoryView(generics.ListAPIView):
@@ -45,6 +46,42 @@ class MainCategoriesView(generics.ListAPIView):
         qs = Category.objects.values('id', 'products').annotate(total=Count('products')) \
                  .order_by('-total').values_list('id', flat=True)[:2]
         return Category.objects.filter(pk__in=qs)
+
+
+class AvailableCashiers(generics.ListAPIView):
+    serializer_class = CashierSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Cashier.objects.filter(is_available=True)
+
+    def get_serializer(self, *args, **kwargs):
+        return CashierSerializer(random.choice(self.get_queryset()))
+
+
+class MakeOrder(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+
+    def create(self, request, *args, **kwargs):
+        request.data['user'] = self.request.user.id
+        return super(MakeOrder, self).create(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+class SearchOrder(generics.ListAPIView):
+
+    def get_queryset(self):
+        transaction = Order.objects.filter(order_id=self.request.query_params.get('orderId', ''))
+        if not transaction.exists():
+            raise Http404()
+        else:
+            return transaction[0]
+
+    def get_serializer(self, *args, **kwargs):
+        return OrderSerializer(self.get_queryset())
 
 
 class GetCart(generics.ListAPIView):
@@ -99,3 +136,10 @@ def delete_from_cart(request):
     qs.delete()
 
     return JsonResponse({'msg': 'Successfully deleted from cart'})
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def order(request):
+    data = json.loads(request.body.decode('utf-8'))

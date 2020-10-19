@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from .models import Category, Product, MeasurementUnit, CartItem
+import sys
+
+from .models import Category, Product, MeasurementUnit, CartItem, Order, Cashier
 
 
 class MeasurementUnitSerializer(serializers.ModelSerializer):
@@ -10,6 +12,8 @@ class MeasurementUnitSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    measurement_unit = MeasurementUnitSerializer()
+
     class Meta:
         model = Product
         fields = '__all__'
@@ -37,3 +41,17 @@ class CategorySerializer(serializers.ModelSerializer):
         child_categories.is_valid()
         data['child_categories'] = child_categories.data
         return data
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_id = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+
+class CashierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cashier
+        fields = '__all__'

@@ -1,8 +1,9 @@
 import string
-from random import random
+import random
 
 from django.db import models
 # Create your models here.
+from django.db.models.signals import post_save
 
 
 class Category(models.Model):
@@ -63,3 +64,37 @@ class CartItem(models.Model):
 
     def __str__(self):
         return "{} has ordered {} of {}".format(self.user.email, self.quantity, self.product.name)
+
+
+class Order(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='orders')
+    order_id = models.CharField(max_length=30, unique=True)
+    cart_items = models.JSONField('items ordered')
+    cost = models.FloatField()
+    payment_method = models.CharField(max_length=30, default='')
+    shipping_address = models.CharField(max_length=100, default='')
+    phone_number = models.CharField(max_length=15, default='')
+
+    @staticmethod
+    def get_random_string():
+        lower_case_letters = string.ascii_lowercase
+        upper_case_letters = string.ascii_uppercase
+        numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        return ''\
+            .join(random.choice(random.choice([lower_case_letters, upper_case_letters, numbers])) for i in range(6))
+
+    def __str__(self):
+        return self.order_id
+
+    def save(self, **kwargs):
+        self.order_id = 'MEDICANN-'+self.get_random_string()
+        super(Order, self).save(**kwargs)
+        
+
+class Cashier(models.Model):
+    name = models.CharField(max_length=100, verbose_name    ='Name of cashier')
+    phone_number = models.CharField(max_length=15, verbose_name='Phone number of cahsier')
+    is_available = models.BooleanField(default=True, verbose_name='Only cashiers available will be located by clients')
+
+    def __str__(self):
+        return self.name
