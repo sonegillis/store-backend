@@ -30,6 +30,13 @@ class CartSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     products = ProductSerializer(many=True)
 
+    def __init__(self, *args, **kwargs):
+        remove_fields = kwargs.pop('remove_fields', None)
+        super(CategorySerializer, self).__init__(*args, **kwargs)
+        if remove_fields:
+            for field in remove_fields:
+                self.fields.pop(field)
+
     class Meta:
         model = Category
         fields = '__all__'

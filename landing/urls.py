@@ -4,7 +4,7 @@ from django.urls import path
 from .views import (
     CategoryView, ProductView, MainCategoriesView,
     add_to_cart, delete_from_cart, GetCart, update_cart,
-    MakeOrder, AvailableCashiers, SearchOrder)
+    MakeOrder, AvailableCashiers, SearchOrder, CreateCategory, CreateProduct)
 
 
 urlpatterns = [
@@ -18,5 +18,7 @@ urlpatterns = [
     path('update-cart', update_cart),
     path('make-order', MakeOrder.as_view()),
     path('cashiers', AvailableCashiers.as_view()),
-    path('search-order', SearchOrder.as_view())
+    path('search-order', SearchOrder.as_view()),
+    path('create-category', CreateCategory.as_view()),
+    path('create-product', CreateProduct.as_view())
 ]

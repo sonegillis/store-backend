@@ -26,6 +26,17 @@ class CategoryView(generics.ListAPIView):
         return Category.objects.all()
 
 
+class CreateCategory(generics.CreateAPIView):
+    # serializer_class = CategorySerializer(remove_fields=['products'])
+
+    def get_serializer(self, *args, **kwargs):
+        return CategorySerializer(remove_fields=['products'], data=self.request.data)
+
+
+class CreateProduct(generics.CreateAPIView):
+    serializer_class = ProductSerializer
+
+
 class ProductView(generics.ListAPIView):
     model = Product
     queryset = Product.objects.all()
