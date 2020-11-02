@@ -57,9 +57,8 @@ class MainCategoriesView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        qs = Category.objects.values('id', 'products').annotate(total=Count('products')) \
-                 .order_by('-total').values_list('id', flat=True)[:2]
-        return Category.objects.filter(pk__in=qs)
+        qs = Category.objects.annotate(cnt=Count('products')).order_by('-cnt')
+        return Category.objects.filter(pk__in=qs[:2])
 
 
 class AvailableCashiers(generics.ListAPIView):
