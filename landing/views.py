@@ -34,7 +34,10 @@ class CreateCategory(generics.CreateAPIView):
 
 
 class CreateProduct(generics.CreateAPIView):
-    serializer_class = ProductSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        print(self.request.FILES)
+        return ProductSerializer(data=self.request.data)
 
 
 class ProductView(generics.ListAPIView):

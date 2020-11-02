@@ -35,7 +35,7 @@ class MeasurementUnit(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, related_name='products')
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)

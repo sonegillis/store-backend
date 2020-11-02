@@ -12,7 +12,8 @@ class MeasurementUnitSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    measurement_unit = MeasurementUnitSerializer()
+    measurement_unit = MeasurementUnitSerializer(read_only=True)
+    measurement_unit_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Product
