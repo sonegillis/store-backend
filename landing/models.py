@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 
 class Category(models.Model):
     name = models.CharField(max_length=30)
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date= models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     short_description = models.CharField(max_length=300, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
