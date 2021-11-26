@@ -16,18 +16,35 @@ ALLOWED_HOSTS = ['*']
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.dPASlinuxSWORDb.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': env('DB_NAME'),
+
+        'USER': env('DB_USER'),
+
+        'PASSWORD': env('DB_PASSWORD'),
+
+        'HOST': 'localhost',
+
+        'PORT': '5432',
+
     }
 }
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
-HOST_DOMAIN = "http://localhost:4200"
+HOST_DOMAIN = "http://192.168.100.22:4200"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
-    "http://192.168.43.182:4200"
+    "http://192.168.100.21:4200",
+    "http://192.168.100.22:4200",
+    "http://192.168.100.23:4200",
 ]

@@ -4,12 +4,13 @@ from django.urls import path
 from .views import (
     CategoryView, ProductView, MainCategoriesView,
     add_to_cart, delete_from_cart, GetCart, update_cart,
-    MakeOrder, AvailableCashiers, SearchOrder, CreateCategory, CreateProduct)
+    MakeOrder, AvailableCashiers, SearchOrder, CreateCategory, CreateProduct, ProductDetailView)
 
 
 urlpatterns = [
     path('categories', CategoryView.as_view()),
     path('products', ProductView.as_view()),
+    path('product-detail/<int:pk>', ProductDetailView.as_view()),
     path('main-categories', MainCategoriesView.as_view()),
     path('category/<int:pk>/products', ProductView.as_view()),
     path('add-to-cart', add_to_cart),

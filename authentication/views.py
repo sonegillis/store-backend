@@ -14,6 +14,10 @@ from rest_framework.utils import json
 
 from .models import TemporaryRegisteredUsers, UserProfile
 from .serializers import UserProfileSerializer, UserSerializer
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 
 @csrf_exempt
@@ -23,12 +27,13 @@ def create_account(request):
     if User.objects.filter(email=email).exists():
         return JsonResponse({'msg': 'User account already exist with this mail', 'erc': 0})
 
-    subject = 'Welcome to Medicannsales'
+    subject = 'Welcome to DC Gas Overflow'
     temporary_user, created = TemporaryRegisteredUsers.objects.get_or_create(email=email)
     temporary_user.save()
     html_response = render_to_string('authentication/account_create_email.html',
                                      {'id': temporary_user.id, 'token': temporary_user.id,
-                                      'domain': settings.HOST_DOMAIN})
+                                      'domain': settings.HOST_DOMAIN, 'request': request})
+    print(html_response)
     response = {
         'msg': 'Your account has been created successfully, Please activate it '
                'by clicking on the link sent to your email',
@@ -82,6 +87,7 @@ def account_setup(request):
 
 class UserView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
+    pagination_class = None
 
     def get_queryset(self):
         return User.objects.get(id=self.request.user.id)

@@ -1,3 +1,4 @@
+import itertools
 import json
 import random
 
@@ -16,11 +17,13 @@ from .serializers import CategorySerializer, ProductSerializer, CartSerializer, 
 
 
 class CategoryView(generics.ListAPIView):
-    model = Category
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
     permission_classes = [permissions.AllowAny]
+    pagination_class = None
+
+    def get_serializer(self, *args, **kwargs):
+        return CategorySerializer(self.get_queryset(), context={"request": self.request},
+                                  remove_fields=['products'], many=True)
 
     def get_queryset(self):
         return Category.objects.all()
@@ -55,10 +58,16 @@ class ProductView(generics.ListAPIView):
 class MainCategoriesView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
     def get_queryset(self):
         qs = Category.objects.annotate(cnt=Count('products')).order_by('-cnt')
         return Category.objects.filter(pk__in=qs[:2])
+
+
+class ProductDetailView(generics.RetrieveAPIView):
+    queryset = Product
+    serializer_class = ProductSerializer
 
 
 class AvailableCashiers(generics.ListAPIView):
@@ -104,6 +113,13 @@ class GetCart(generics.ListAPIView):
     def get_queryset(self):
         return CartItem.objects.filter(user_id=self.request.user.id)
 
+    def list(self, request, *args, **kwargs):
+        cart = self.get_serializer(self.get_queryset(), many=True)
+        data = {}
+        for product_id, cart_item in itertools.groupby(cart.data, lambda product: product.get('product').get('id')):
+            data[product_id] = list(cart_item)
+        return Response(data)
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -113,6 +129,7 @@ def add_to_cart(request):
         user = request.user
         data = json.loads(request.body.decode('utf-8'))
         cart_item, created = CartItem.objects.get_or_create(user_id=user.id, product_id=data['product'],
+                                                            measurement_unit_id=data['measurementUnit'],
                                                             defaults={'quantity': data['quantity']})
         if not created:
             cart_item.quantity = cart_item.quantity + data['quantity']

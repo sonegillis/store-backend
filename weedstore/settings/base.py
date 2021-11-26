@@ -90,6 +90,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
 }
 
 
@@ -154,3 +157,9 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = env('EMAIL')
 EMAIL_HOST_PASSWORD = env('PASSWORD')
+
+
+if env('ENVIRONMENT') == 'development':
+    from .development import *
+else:
+    from .production import *
