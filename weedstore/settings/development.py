@@ -40,11 +40,15 @@ DATABASES = {
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
-HOST_DOMAIN = "http://192.168.100.22:4200"
+# HOST_DOMAIN = "http://192.168.100.22:4200"
+HOST_DOMAIN = "http://172.20.10.3:4200"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
+    "http://localhost:8100",
     "http://192.168.100.21:4200",
     "http://192.168.100.22:4200",
+    "http://192.168.100.22:8100",
     "http://192.168.100.23:4200",
+    "http://172.20.10.3:4200"
 ]

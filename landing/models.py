@@ -4,6 +4,7 @@ import random
 from django.db import models
 # Create your models here.
 from django.db.models.signals import post_save
+from django.utils import timezone
 
 from jsonfield import JSONField
 
@@ -42,15 +43,12 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, related_name='products')
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    # measurement_unit = models.ForeignKey(MeasurementUnit, on_delete=models.DO_NOTHING)
     in_stock = models.BooleanField(default=True)
-    # price_per_unit = models.FloatField()
     image = models.ImageField(upload_to='product_images')
     rating = models.FloatField(default=5)
-    # min_order = models.FloatField()
-    # discount_price_per_unit = models.FloatField(null=True)
     visible = models.BooleanField(default=True, help_text="Appear in product listings")
     description = models.TextField(null=True)
+    thumbnail = models.ImageField(null=True)
 
     class Meta:
         verbose_name_plural = 'Products'
@@ -58,7 +56,13 @@ class Product(models.Model):
     def get_image(self):
         from django.utils.html import mark_safe
         return mark_safe('<img src="/media/%s" width="150" height="150"/>' % self.image.name)
+
+    def get_thumbnail(self):
+        from django.utils.html import mark_safe
+        return mark_safe('<img src="/media/%s" width="150" height="150"/>' % self.thumbnail.name)
+
     get_image.short_description = "Image Preview"
+    get_thumbnail.short_description = "Thumbnail Preview"
 
     def __str__(self):
         return self.name
@@ -78,27 +82,40 @@ class ProductMeasurementUnit(models.Model):
         return f"{self.product.name}_{self.measurement_unit.name}_${self.price}"
 
 
+class Cart(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='cart')
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_ordered = models.BooleanField(default=False)
+
+
 class CartItem(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='carts')
+    # user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='carts')
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE, related_name='items', null=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='products')
     measurement_unit = models.ForeignKey('MeasurementUnit', on_delete=models.CASCADE, related_name='measurement_units')
     quantity = models.IntegerField()
 
     class Meta:
-        unique_together = ('user', 'product', 'measurement_unit')
+        unique_together = ('cart', 'product', 'measurement_unit')
 
     def __str__(self):
-        return "{} has ordered {} of {}".format(self.user.email, self.quantity, self.product.name)
+        return "{} has ordered {} of {}".format(self.cart.user.email, self.quantity, self.product.name)
 
 
 class Order(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='orders')
+    cart = models.OneToOneField('Cart', on_delete=models.CASCADE, null=True, unique=True)
     order_id = models.CharField(max_length=30, unique=True)
-    cart_items = JSONField('items ordered')
     cost = models.FloatField()
-    payment_method = models.CharField(max_length=30, default='')
+    payment_method = models.ForeignKey('PaymentMethod', on_delete=models.CASCADE, default='1')
+    state = models.CharField(max_length=50, default='')
+    city = models.CharField(max_length=50, default='')
     shipping_address = models.CharField(max_length=100, default='')
     phone_number = models.CharField(max_length=15, default='')
+    is_paid = models.BooleanField(default=False)
+    order_status = models.ForeignKey('OrderStatus', null=True, on_delete=models.SET_NULL, related_name='orders')
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    payment_screenshot = models.ImageField(null=True, upload_to='payment_screenshots')
 
     @staticmethod
     def get_random_string():
@@ -112,13 +129,16 @@ class Order(models.Model):
         return self.order_id
 
     def save(self, **kwargs):
-        self.order_id = 'MEDICANN-'+self.get_random_string()
+        if not self.order_id:
+            self.order_id = 'DCGASOVERFLOW-' + self.get_random_string()
         super(Order, self).save(**kwargs)
         
 
 class Cashier(models.Model):
     name = models.CharField(max_length=100, verbose_name='Name of cashier')
-    phone_number = models.CharField(max_length=15, verbose_name='Phone number of cahsier')
+    phone_number = models.CharField(max_length=15, verbose_name='Phone number of cashier')
+    email = models.CharField(max_length=50)
+    signature = models.ImageField(upload_to='signatures/', null=True)
     is_available = models.BooleanField(default=True, verbose_name='Only cashiers available will be located by clients')
 
     def __str__(self):
@@ -155,3 +175,41 @@ class AdvertProduct(models.Model):
     advert = models.ForeignKey(Advert, on_delete=models.CASCADE)
     measurement_unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+
+
+class Faq(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+    ordering = models.IntegerField(default=0)
+
+    def __str__(self):
+        return "{}: {} => {}".format(self.ordering, self.question, self.answer)
+
+
+class PaymentMethod(models.Model):
+    name = models.CharField(max_length=50)
+    short_description = models.CharField(max_length=50)
+    description = models.TextField()
+    logo = models.ImageField()
+    detail = models.CharField(max_length=50, blank=True)
+    detail_name = models.CharField(max_length=100, blank=True)
+    active = models.BooleanField(default=False)
+    show_qrcode = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+    def get_logo(self):
+        from django.utils.html import mark_safe
+        return mark_safe('<img src="/media/%s" width="150" height="150"/>' % self.logo.name)
+
+
+class OrderStatus(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField()
+
+    class Meta:
+        verbose_name_plural = 'Order Status'
+
+    def __str__(self):
+        return self.name

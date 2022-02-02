@@ -1,0 +1,47 @@
+{% load landing_extras %}
+{% for key, value in cartItems.items %}
+    <div class="container cart_item_wrapper mb-2 border-bottom">
+        <div class="row">
+            <div class="col-3 d-flex align-items-center">
+                <img src="{{ value.0|get_dict_item_from_key:'product'|get_dict_item_from_key:'image' }}"
+                     alt="{{ value.0|get_dict_item_from_key:'product'|get_dict_item_from_key:'name' }}"/>
+            </div>
+            <div class="col-7 d-flex flex-column justify-content-center align-items-center">
+                <p class="product_name">{{ value.0|get_dict_item_from_key:'product'|get_dict_item_from_key:'name' }}</p>
+                {% for order in value %}
+                    <div>
+                        <p>{{ order|get_dict_item_from_key:'quantity' }} x
+                            {% if order|get_dict_item_from_key:'discount_price' %}
+                                ${{ order|get_dict_item_from_key:'discount_price' }}
+                            {% else %}
+                                ${{ order|get_dict_item_from_key:'price' }}
+                            {% endif %}<small
+                                    class="text-muted ion-no-padding">/
+                                {{ order|get_dict_item_from_key:'measurement_unit'|get_dict_item_from_key:'short_name' }}</small>
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <p class="font-weight-bold sub_total_text">SUB TOTAL</p>
+            </div>
+            <div class="col-6">
+                <p class="font-weight-bold sub_total_text">${{ value|get_cart_subtotal }}</p>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <p class="fw-bold sub_total_text">TOTAL</p>
+        </div>
+        <div class="col-6">
+            <p class="fw-bold sub_total_text">${{ cartItems|get_order_total }}</p>
+        </div>
+    </div>
+</div>
+
+<input class="hidden" type="text" name="cart" value="{{ cart }}" />

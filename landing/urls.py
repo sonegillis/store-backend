@@ -1,14 +1,18 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
 from .views import (
     CategoryView, ProductView, MainCategoriesView,
     add_to_cart, delete_from_cart, GetCart, update_cart,
-    MakeOrder, AvailableCashiers, SearchOrder, CreateCategory, CreateProduct, ProductDetailView)
+    MakeOrder, AvailableCashiers, SearchOrder, CreateCategory, CreateProduct, ProductDetailView,
+    GetCategory, FaqsView, PaymentMethodsView, GetOrders, upload_screenshot)
 
 
 urlpatterns = [
     path('categories', CategoryView.as_view()),
+    path('category/<int:pk>', GetCategory.as_view()),
     path('products', ProductView.as_view()),
     path('product-detail/<int:pk>', ProductDetailView.as_view()),
     path('main-categories', MainCategoriesView.as_view()),
@@ -21,5 +25,9 @@ urlpatterns = [
     path('cashiers', AvailableCashiers.as_view()),
     path('search-order', SearchOrder.as_view()),
     path('create-category', CreateCategory.as_view()),
-    path('create-product', CreateProduct.as_view())
-]
+    path('create-product', CreateProduct.as_view()),
+    path('faqs', FaqsView.as_view()),
+    path('payment-methods', PaymentMethodsView.as_view()),
+    path('orders', GetOrders.as_view()),
+    path('upload-screenshot', upload_screenshot),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

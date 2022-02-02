@@ -1,0 +1,10 @@
+.related-widget-wrapper {
+    width: calc(100% - 160px);
+}
+.cart_item_wrapper {
+    clear: left;
+}
+.cart_item_wrapper img {
+    max-height: 150px;
+    max-width: 150px;
+}

@@ -33,7 +33,7 @@ def create_account(request):
     html_response = render_to_string('authentication/account_create_email.html',
                                      {'id': temporary_user.id, 'token': temporary_user.id,
                                       'domain': settings.HOST_DOMAIN, 'request': request})
-    print(html_response)
+
     response = {
         'msg': 'Your account has been created successfully, Please activate it '
                'by clicking on the link sent to your email',
@@ -105,9 +105,13 @@ class UserProfileView(generics.GenericAPIView):
         return Response(user_profile_serializer.data)
 
     def post(self, *args):
+        state = self.request.data.get('state')
+        city = self.request.data.get('city')
         user_address = self.request.data.get('user_address', '')
         phone_number = self.request.data.get('phone_number', '')
         user_profile = UserProfile.objects.get(user_id=self.request.user.id)
+        user_profile.state = state
+        user_profile.city = city
         user_profile.shipping_address = user_address
         user_profile.phone_number = phone_number
         user_profile.save()

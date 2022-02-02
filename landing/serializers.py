@@ -1,8 +1,11 @@
+from django.contrib.sites.shortcuts import get_current_site
+from collections import OrderedDict
+
 from rest_framework import serializers
 
-import sys
-
-from .models import Category, Product, MeasurementUnit, CartItem, Order, Cashier, ProductImage, ProductMeasurementUnit
+from . import helper
+from .models import Category, Product, MeasurementUnit, CartItem, Order, Cashier, ProductImage, ProductMeasurementUnit, \
+    Faq, PaymentMethod, Cart, OrderStatus
 
 
 class MeasurementUnitSerializer(serializers.ModelSerializer):
@@ -52,7 +55,7 @@ class CartProductSerializer(serializers.RelatedField):
         return {
             'id': instance.id,
             'name': instance.name,
-            'image': self.context['request'].build_absolute_uri(instance.image.url),
+            'image': '{}{}'.format(get_current_site(None), instance.image.url)
         }
 
 
@@ -65,9 +68,17 @@ class CartSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['product', 'measurement_unit', 'quantity']
 
+    def to_representation(self, instance: CartItem):
+        data: OrderedDict = super(CartSerializer, self).to_representation(instance)
+        product_measurement_unit = ProductMeasurementUnit.objects.get(product=instance.product,
+                                                                      measurement_unit=instance.measurement_unit)
+        data['price'] = product_measurement_unit.price
+        data['discount_price'] = product_measurement_unit.discount_price
+        return data
+
 
 class CategorySerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True)
+    products = serializers.SerializerMethodField("get_products")
 
     def __init__(self, *args, **kwargs):
         self.remove_fields = kwargs.pop('remove_fields', None)
@@ -80,6 +91,9 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+    def get_products(self, instance):
+        return ProductSerializer(instance.products, context=self.context, many=True).data
+
     def to_representation(self, instance):
         data = super(CategorySerializer, self).to_representation(instance)
         pk = data.get('id')
@@ -90,6 +104,18 @@ class CategorySerializer(serializers.ModelSerializer):
         return data
 
 
+class OrderStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderStatus
+        fields = '__all__'
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = '__all__'
+
+
 class OrderSerializer(serializers.ModelSerializer):
     order_id = serializers.CharField(read_only=True)
 
@@ -98,7 +124,31 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderListSerializer(serializers.ModelSerializer):
+    order_status = OrderStatusSerializer()
+    payment_method = PaymentMethodSerializer()
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def to_representation(self, instance: Order):
+        print('user is ', self.context['request'].user.id)
+        print('cart ', instance.cart.id)
+        cart_items = helper.get_user_cart_from_cart(Cart.objects.get(id=instance.cart.id), self.context)
+        print('cart items ', cart_items)
+        data = super(OrderListSerializer, self).to_representation(instance)
+        data.setdefault('cart_items', cart_items)
+        return data
+
+
 class CashierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cashier
+        fields = '__all__'
+
+
+class FaqSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Faq
         fields = '__all__'

@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
     <body>
-    <div style="display: flex; justify-content: center; width: 100%">
-        {% load static %}
-        <img alt="DC Gas Overflow" src="{{ request.get_host }}{% static 'authentication/logo.png' %}" />
-    </div>
-    <p style="text-align: center; font-size: 1.2em;">
-        Welcome to DC Gas Overflow. The best online platform for your cannabis purchase.
-        Please click the button below to confirm your email address and activate your account.
-    </p>
+        <div style="display: flex; justify-content: center; width: 100%">
+            {% load static %}
+            <img alt="DC Gas Overflow" src="{{ domain }}/static/authentication/logo.png" />
+        </div>
+        <p style="font-size: 1.2em;">
+            Welcome to DC Gas Overflow. The best online platform for your cannabis purchase.
+                Please click the button below to confirm your email address and activate your account.
+        </p>
 
-    <div style="display: flex; justify-content: center; width: 100%">
-        <button style="background-color: #699551; color: #fff; padding: 12px 6px; border-radius: 6px; border: none; width: 120px">
-            <a style="color: #fff; text-decoration:none; font-weight: bold; font-size: 1.2em"
-               href="{{ domain }}/account-setup/{{ token }}">Confirm Now</a></button>
-    </div>
+        <div style="display: flex; justify-content: center; width: 100%">
+            <button style="background-color: #699551; color: #fff; padding: 12px 6px; border-radius: 6px; border: none; width: 200px; margin: 0 auto">
+                <a style="color: #fff; text-decoration:none; font-weight: bold; font-size: 1.2em"
+                   href="{{ domain }}/account-setup/{{ token }}">Complete Signup</a></button>
+        </div>
     </body>
 </html>
