@@ -20,6 +20,7 @@ from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
+    path('admin/', include('smuggler.urls')),  # before admin url patterns!
     path('admin/', admin.site.urls),
     path('landing/', include('landing.urls')),
     path('auth/token', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
