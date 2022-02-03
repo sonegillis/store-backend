@@ -26,7 +26,7 @@ MEDIA_ROOT = '/home/ubuntu/media'
 SECRET_KEY = env('SECRET_KEY')
 HOST_DOMAIN = env('PRODUCTION_DOMAIN')
 
-SMUGGLER_FIXTURE_DIR = 'home/ubuntu/apps/dbbackup'
+SMUGGLER_FIXTURE_DIR = '/'
 
 CORS_ALLOWED_ORIGINS = [
     HOST_DOMAIN,

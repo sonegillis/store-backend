@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'landing',
-    'authentication'
+    'authentication',
+    'smuggler'
 ]
 
 MIDDLEWARE = [
