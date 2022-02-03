@@ -37,6 +37,9 @@ DATABASES = {
     }
 }
 
+SMUGGLER_FIXTURE_DIR = ''
+SMUGGLER_EXCLUDE_LIST = ['landing.cart', 'landing.cartItem']
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
