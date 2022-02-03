@@ -19,10 +19,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
-STATIC_ROOT = 'static/'
+
+STATIC_ROOT = '/home/ubuntu/static'
 MEDIA_ROOT = '/home/ubuntu/media'
 
 SECRET_KEY = env('SECRET_KEY')
