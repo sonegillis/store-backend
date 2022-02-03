@@ -27,7 +27,7 @@ SECRET_KEY = env('SECRET_KEY')
 HOST_DOMAIN = env('PRODUCTION_DOMAIN')
 
 SMUGGLER_FIXTURE_DIR = '/'
-SMUGGLER_EXCLUDE_LIST = ['landing.Cart', 'landing.CartItem']
+SMUGGLER_EXCLUDE_LIST = ['landing.cart', 'landing.cartItem']
 
 CORS_ALLOWED_ORIGINS = [
     HOST_DOMAIN,

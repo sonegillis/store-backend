@@ -14,10 +14,6 @@ from rest_framework.utils import json
 
 from .models import TemporaryRegisteredUsers, UserProfile
 from .serializers import UserProfileSerializer, UserSerializer
-import environ
-
-env = environ.Env()
-environ.Env.read_env()
 
 
 @csrf_exempt
