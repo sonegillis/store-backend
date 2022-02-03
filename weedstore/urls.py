@@ -22,11 +22,11 @@ from rest_framework_simplejwt import views as jwt_views
 urlpatterns = [
     path('admin/', include('smuggler.urls')),  # before admin url patterns!
     path('admin/', admin.site.urls),
-    path('landing/', include('landing.urls')),
-    path('auth/token', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/token/verify', jwt_views.TokenVerifyView.as_view(), name='token_verify'),
-    path('auth/', include('authentication.urls'))
+    path('api/v1/landing/', include('landing.urls')),
+    path('api/v1/auth/token', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/auth/token/refresh', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/auth/token/verify', jwt_views.TokenVerifyView.as_view(), name='token_verify'),
+    path('api/v1/auth/', include('authentication.urls'))
 ]
 
 if settings.DEBUG:
