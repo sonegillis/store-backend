@@ -7,7 +7,7 @@ from .views import (
     CategoryView, ProductView, MainCategoriesView,
     add_to_cart, delete_from_cart, GetCart, update_cart,
     MakeOrder, AvailableCashiers, SearchOrder, CreateCategory, CreateProduct, ProductDetailView,
-    GetCategory, FaqsView, PaymentMethodsView, GetOrders, upload_screenshot)
+    GetCategory, FaqsView, PaymentMethodsView, GetOrders, upload_screenshot, NewsLetterSubscribe)
 
 
 urlpatterns = [
@@ -29,5 +29,6 @@ urlpatterns = [
     path('faqs', FaqsView.as_view()),
     path('payment-methods', PaymentMethodsView.as_view()),
     path('orders', GetOrders.as_view()),
+    path('newsletter-subscribe', NewsLetterSubscribe.as_view()),
     path('upload-screenshot', upload_screenshot),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

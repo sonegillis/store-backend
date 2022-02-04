@@ -2,7 +2,7 @@ import itertools
 import json
 import random
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import JsonResponse, Http404, HttpResponse
 
 # Create your views here.
@@ -13,10 +13,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from . import helper
-from .models import Category, Product, CartItem, Order, Cashier, Faq, PaymentMethod, Cart
+from .models import Category, Product, CartItem, Order, Cashier, Faq, PaymentMethod, Cart, NewsLetter
 from .serializers import (
     CategorySerializer, ProductSerializer, CartSerializer, OrderSerializer, CashierSerializer, FaqSerializer,
-    PaymentMethodSerializer, OrderListSerializer)
+    PaymentMethodSerializer, OrderListSerializer, NewsletterSerializer)
 
 
 class CategoryView(generics.ListAPIView):
@@ -29,7 +29,11 @@ class CategoryView(generics.ListAPIView):
                                   remove_fields=['products'], many=True)
 
     def get_queryset(self):
-        return Category.objects.all()
+        categories = Category.objects.all()
+        for category in categories:
+            if not len(category.products.all()):
+                categories = categories.exclude(id=category.id)
+        return categories
 
 
 class CreateCategory(generics.CreateAPIView):
@@ -231,3 +235,7 @@ class PaymentMethodsView(generics.ListAPIView):
     serializer_class = PaymentMethodSerializer
     queryset = PaymentMethod.objects.filter(active=True)
 
+
+class NewsLetterSubscribe(generics.ListCreateAPIView):
+    queryset = NewsLetter.objects.all()
+    serializer_class = NewsletterSerializer

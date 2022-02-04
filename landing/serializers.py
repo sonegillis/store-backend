@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from . import helper
 from .models import Category, Product, MeasurementUnit, CartItem, Order, Cashier, ProductImage, ProductMeasurementUnit, \
-    Faq, PaymentMethod, Cart, OrderStatus
+    Faq, PaymentMethod, Cart, OrderStatus, NewsLetter
 
 
 class MeasurementUnitSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(ProductImageSerializer, self).to_representation(instance)
-        return self.context.get("request").build_absolute_uri(data.get("image"))
+        return data.get("image")
 
 
 class ProductMeasurementUnitSerializer(serializers.ModelSerializer):
@@ -133,10 +133,7 @@ class OrderListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_representation(self, instance: Order):
-        print('user is ', self.context['request'].user.id)
-        print('cart ', instance.cart.id)
         cart_items = helper.get_user_cart_from_cart(Cart.objects.get(id=instance.cart.id), self.context)
-        print('cart items ', cart_items)
         data = super(OrderListSerializer, self).to_representation(instance)
         data.setdefault('cart_items', cart_items)
         return data
@@ -151,4 +148,10 @@ class CashierSerializer(serializers.ModelSerializer):
 class FaqSerializer(serializers.ModelSerializer):
     class Meta:
         model = Faq
+        fields = '__all__'
+
+
+class NewsletterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsLetter
         fields = '__all__'

@@ -4,8 +4,8 @@ from django.contrib import admin
 from .forms import OrderForm
 from .models import Category, Product, MeasurementUnit, \
     Cashier, ProductImage, Advert, AdvertProduct, \
-    ProductMeasurementUnit, Faq, PaymentMethod, OrderStatus, Order
-from .widgets import CartItemWidget
+    ProductMeasurementUnit, Faq, PaymentMethod, OrderStatus, Order, NewsLetter
+
 
 
 class ProductInline(admin.StackedInline):
@@ -84,4 +84,9 @@ class PaymentMethodsAdmin(admin.ModelAdmin):
 
 @admin.register(OrderStatus)
 class OrderStatus(admin.ModelAdmin):
+    pass
+
+
+@admin.register(NewsLetter)
+class NewsletterAdmin(admin.ModelAdmin):
     pass

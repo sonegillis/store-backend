@@ -213,3 +213,10 @@ class OrderStatus(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class NewsLetter(models.Model):
+    email = models.EmailField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.email

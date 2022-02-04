@@ -12,6 +12,8 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.utils import json
 
+from landing.models import NewsLetter
+from landing.serializers import NewsletterSerializer
 from .models import TemporaryRegisteredUsers, UserProfile
 from .serializers import UserProfileSerializer, UserSerializer
 
